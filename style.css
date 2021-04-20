@@ -1,0 +1,5 @@
+body {
+    background-image: linear-gradient(rgba(255,255,255,0.5), rgba(255,255,255,0.5)), url(images/bacteria.jpg);
+    background-size: 5% 5%;
+    background-attachment: fixed;
+}
