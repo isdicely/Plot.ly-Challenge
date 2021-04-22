@@ -1,5 +1,21 @@
+@import url("bootstrap.min.css");
+@import url("bootstrap-theme.css");
+
+.jumbotron {
+    color: #f5f3f3;
+    background-color:rgba(180, 150, 190, 1) !important;
+    }
+.well {
+    color:#0c0c0c;
+    background-color:rgba(180, 150, 190, 1) !important;
+}
+.panel{
+    color: #0c0c0c;
+    background-color:rgba(180, 150, 190, 1) !important;
+}
+
 body {
-    background-image: linear-gradient(rgba(255,255,255,0.5), rgba(255,255,255,0.5)), url(images/bacteria.jpg);
+    background-image: linear-gradient(rgba(255,255,255,0.2), rgba(255,255,255,0.2)), url(images/bacteria.jpg);
     background-size: 5% 5%;
     background-attachment: fixed;
 }
