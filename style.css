@@ -1,5 +1,3 @@
-@import url("bootstrap.min.css");
-@import url("bootstrap-theme.css");
 
 .jumbotron {
     color: #f5f3f3;
@@ -16,6 +14,6 @@
 
 body {
     background-image: linear-gradient(rgba(255,255,255,0.2), rgba(255,255,255,0.2)), url(images/bacteria.jpg);
-    background-size: 5% 5%;
+    background-size: 10% 10%;
     background-attachment: fixed;
 }
