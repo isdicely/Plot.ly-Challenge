@@ -11,39 +11,37 @@ function init() {
       // Select the starting information to load on opening
       if (i == 0) {
         //   1st ID displayed on Test Subjec ID No.
-        var starting_id = data.names[i];
-        // x, y and hover_labels for bar graph
-        var x = data.samples
-          .find((sample) => sample.id === starting_id)
-          .sample_values.slice(0, 10)
-          .reverse();
-        var y = data.samples
-          .find((sample) => sample.id === starting_id)
-          .otu_ids.slice(0, 10)
-          .reverse()
-          .map((id) => `OTU ${id}`);
-        var hover_label = data.samples
-          .find((sample) => sample.id === starting_id)
-          .otu_labels.slice(0, 10)
-          .reverse();
-        // Information for bubble chart
-        var x_bb = data.samples
-          .find((sample) => sample.id === starting_id)
-          .otu_ids;
-        var y_bb = data.samples
-        .find((sample) => sample.id === starting_id)
+        var starting_ID = data.names[i];
+      }
+      // x, y and hover_labels for bar graph
+      var x = data.samples
+        .find((sample) => sample.id === starting_ID)
+        .sample_values.slice(0, 10)
+        .reverse();
+      var y = data.samples
+        .find((sample) => sample.id === starting_ID)
+        .otu_ids.slice(0, 10)
+        .reverse()
+        .map((id) => `OTU ${id}`);
+      var hover_label = data.samples
+        .find((sample) => sample.id === starting_ID)
+        .otu_labels.slice(0, 10)
+        .reverse();
+
+      // Information for bubble chart
+      var selected_ID = data.names[i];
+      var x_bb = data.samples.find((sample) => sample.id === starting_ID)
+        .otu_ids;
+      var y_bb = data.samples.find((sample) => sample.id === starting_ID)
         .sample_values;
-        var marker_size = data.samples
-        .find((sample) => sample.id === starting_id)
+      var marker_size = data.samples.find((sample) => sample.id === starting_ID)
         .sample_values;
-        var marker_color = data.samples
-          .find((sample) => sample.id === starting_id)
-          .otu_ids;
-        var text_value = data.samples
-        .find((sample) => sample.id === starting_id)
+      var marker_color = data.samples.find(
+        (sample) => sample.id === starting_ID
+      ).otu_ids;
+      var text_value = data.samples.find((sample) => sample.id === starting_ID)
         .otu_labels;
 
-      }
       // Populate the dropdown menu
       // Use D3 to select the dropdown menu
       var dropdownMenu = d3.selectAll("#selDataset").node();
@@ -65,14 +63,14 @@ function init() {
         hoverlabel: { bgcolor: "white" },
         name: "Bellybutton",
         marker: {
-          color: "rgba(190,110,240,1)",
+          color: "rgba(190,0,240,1)",
           width: 1,
         },
       },
     ];
     // Set bar graph layout
     var layout_bar = {
-      title: `Test Subject ID No: ${starting_id}`,
+      title: `Test Subject : Top 10 OTU Profile`,
       xaxis: { title: "Sample Value" },
     };
     // set responsive action for bar graph
@@ -80,50 +78,36 @@ function init() {
     // Deploy the bar graph
     Plotly.newPlot("bar", data_bar, layout_bar, configuration);
 
-    // Bubble chart
+    // Bubble chart data
     var data_bubble = [
-        {
-            type: "scatter",
-            mode: "markers",
-            x: x_bb,
-            y: y_bb,
-            marker: {
-                color: marker_color,
-                colorscale: [[0,'rgb(19, 11, 24'], [1, 'rgb(190,110,240)']],
-                cmin: 0,
-                cmax: 50,
-                size: marker_size,
-                sizemode: 'area',
-                colorbar: {
-                    thickness: 10,
-                    y: 0.5,
-                    ypad: 0,
-                    title: "OTU Abundance",
-                    title_slide: "bottom",
-                    outlinewidth: 1,
-                    outlinecolor: 'black',
-                    thickfont: {
-                        family: 'Lato',
-                        size: 14,
-                        color: 'green'
-                    }
-                }
+      {
+        type: "scatter",
+        mode: "markers",
+        x: x_bb,
+        y: y_bb,
+        text: text_value,
+        hoverlabel: { bgcolor: "white" },
+        marker: {
+          color: marker_color,
+          colorscale: "Rainbow",
 
-            }
-        }
-    ]
-
+          size: marker_size.map(x => x*10),
+          sizemode: "area",
+        },
+      },
+    ];
     // Bubble chart layout
     var layout_bubble = {
-        title: `Test Subject ID No: ${starting_id}`,
-        xaxis: { title: "OTU ID"},
-        yaxis: {title: "Sample Value"}
+      title: "Test Subject : OTU Profile",
+      xaxis: { title: "OTU ID" },
+      yaxis: { title: "Sample Value" },
     };
     // Deploy the bubble chart
-    Plotly.newPlot("bubble", data_bubble, layout_bubble, configuration)
+    Plotly.newPlot("bubble", data_bubble, layout_bubble, configuration);
 
     // Call updatePlotly() when a change takes place to the DOM
-    d3.selectAll("#selDataset").on("change", updateBarPlotly);
+    d3.selectAll("#selDataset").on("change", update_all);
+    
   });
 }
 
@@ -152,7 +136,7 @@ function updateBarPlotly() {
     // Note the extra brackets around 'x' and 'y'
     Plotly.restyle("bar", "x", [x]);
     Plotly.restyle("bar", "y", [y]);
-    Plotly.restyle("bar", "text", hover_label);
+    Plotly.restyle("bar", "text", [hover_label]);
   });
 }
 
@@ -168,8 +152,24 @@ function updateBubbleChart() {
     // Assign a variable after diving into the data to find the selected Test Subject ID No.
     var dataset = data.samples[dataset_id];
 
-    // Retrieve x_bb, y_bb, marker size, colors, text values
+    // Retrieve bubble chart information
+    var x_bb = dataset.otu_ids;
+    var y_bb = dataset.sample_values;
+    var marker_size = dataset.sample_values;
+    var marker_color = dataset.otu_ids;
+    var text_value = dataset.otu_labels;
+    // Restyle the bubble chat
+    Plotly.restyle("bubble", "x", [x_bb]);
+    Plotly.restyle("bubble", "y", [y_bb]);
+    Plotly.restyle("bubble", "size", [marker_size]);
+    PLotly.restyle("bubble", "color", [marker_color]);
+    Plotly.restyle("bubble", "text", [text_value]);
   });
 }
 
+// Function to run functions
+function update_all (){
+    updateBarPlotly();
+    updateBubbleChart();
+}
 init();
