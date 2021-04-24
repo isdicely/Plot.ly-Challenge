@@ -6,43 +6,13 @@ function init() {
     //   diplay data on console
     console.log(data);
 
-    // Retrive the names of the ID to populate the Test Subject ID No.
+    // Retrive the names of the ID to populate the Test Subject ID No. dropdown menu
     for (var i = 0; i < data.names.length; i++) {
       // Select the starting information to load on opening
       if (i == 0) {
         //   1st ID displayed on Test Subjec ID No.
         var starting_ID = data.names[i];
       }
-      // x, y and hover_labels for bar graph
-      var x = data.samples
-        .find((sample) => sample.id === starting_ID)
-        .sample_values.slice(0, 10)
-        .reverse();
-      var y = data.samples
-        .find((sample) => sample.id === starting_ID)
-        .otu_ids.slice(0, 10)
-        .reverse()
-        .map((id) => `OTU ${id}`);
-      var hover_label = data.samples
-        .find((sample) => sample.id === starting_ID)
-        .otu_labels.slice(0, 10)
-        .reverse();
-
-      // Information for bubble chart
-      var selected_ID = data.names[i];
-      var x_bb = data.samples.find((sample) => sample.id === starting_ID)
-        .otu_ids;
-      var y_bb = data.samples.find((sample) => sample.id === starting_ID)
-        .sample_values;
-      var marker_size = data.samples.find((sample) => sample.id === starting_ID)
-        .sample_values;
-      var marker_color = data.samples.find(
-        (sample) => sample.id === starting_ID
-      ).otu_ids;
-      var text_value = data.samples.find((sample) => sample.id === starting_ID)
-        .otu_labels;
-
-      // Populate the dropdown menu
       // Use D3 to select the dropdown menu
       var dropdownMenu = d3.selectAll("#selDataset").node();
       //   Append the IDs as options into "#selDataset" which is the dropdown meny
@@ -51,6 +21,54 @@ function init() {
       opt.innerHTML = data.names[i];
       dropdownMenu.appendChild(opt);
     }
+    //   Demographic information at first start
+    // Use D3 to select the Demographic Info - Panel body
+
+    var demographicInfo = document.getElementById("sample-metadata");
+    var ul = document.createElement("ul");
+
+    ul.setAttribute("id", "theList");
+
+    const metadata_entry = data.metadata.find(
+      (entry) => entry.id == starting_ID
+    );
+    const individual_info = Object.entries(metadata_entry);
+
+    for (var j = 0; j < individual_info.length; j++) {
+      var p = document.createElement("p");
+      const [key, value] = individual_info[j];
+      p.innerHTML = `${key}: ${value}`;
+      demographicInfo.appendChild(p);
+    }
+    
+
+    // Information for bar graph
+    var x = data.samples
+      .find((sample) => sample.id === starting_ID)
+      .sample_values.slice(0, 10)
+      .reverse();
+    var y = data.samples
+      .find((sample) => sample.id === starting_ID)
+      .otu_ids.slice(0, 10)
+      .reverse()
+      .map((id) => `OTU ${id}`);
+    var hover_label = data.samples
+      .find((sample) => sample.id === starting_ID)
+      .otu_labels.slice(0, 10)
+      .reverse();
+
+    // Information for bubble chart
+    var selected_ID = data.names[i];
+    var x_bb = data.samples.find((sample) => sample.id === starting_ID).otu_ids;
+    var y_bb = data.samples.find((sample) => sample.id === starting_ID)
+      .sample_values;
+    var marker_size = data.samples.find((sample) => sample.id === starting_ID)
+      .sample_values;
+    var marker_color = data.samples.find((sample) => sample.id === starting_ID)
+      .otu_ids;
+    var text_value = data.samples.find((sample) => sample.id === starting_ID)
+      .otu_labels;
+
     // Set the bar graph
     data_bar = [
       {
@@ -91,7 +109,7 @@ function init() {
           color: marker_color,
           colorscale: "Rainbow",
 
-          size: marker_size.map(x => x*10),
+          size: marker_size.map((x) => x * 10),
           sizemode: "area",
         },
       },
@@ -107,7 +125,6 @@ function init() {
 
     // Call updatePlotly() when a change takes place to the DOM
     d3.selectAll("#selDataset").on("change", update_all);
-    
   });
 }
 
@@ -167,9 +184,23 @@ function updateBubbleChart() {
   });
 }
 
+// Function to add individual's demographic information
+function updateDemographic_info() {
+  // Get data
+  d3.json("data/samples.json").then(function (data) {
+    // Use D3 to select teh dropdown menu to retrieve the Test Subject ID No.
+    // This will be used to display on the information for the bubble chart
+    var dropdownMenu = d3.select("#selDataset");
+    // Assign the value of the dropdown menu option to a variable
+    var id = dropdownMenu.property("value");
+    // Assign a variable after diving into the data to find the selected Test Subject ID No.
+    var dataset = data.metadata[id];
+  });
+}
+
 // Function to run functions
-function update_all (){
-    updateBarPlotly();
-    updateBubbleChart();
+function update_all() {
+  updateBarPlotly();
+  updateBubbleChart();
 }
 init();
