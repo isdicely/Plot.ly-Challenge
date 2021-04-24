@@ -21,26 +21,23 @@ function init() {
       opt.innerHTML = data.names[i];
       dropdownMenu.appendChild(opt);
     }
-    //   Demographic information at first start
+
+    // Demographic information at first start
     // Use D3 to select the Demographic Info - Panel body
-
     var demographicInfo = document.getElementById("sample-metadata");
-    var ul = document.createElement("ul");
-
-    ul.setAttribute("id", "theList");
-
+    // Retrieve the metadata information using the starting_ID
     const metadata_entry = data.metadata.find(
       (entry) => entry.id == starting_ID
     );
+    // Select the information to display
     const individual_info = Object.entries(metadata_entry);
-
+    // Loop through object to retrive all key value pairs and display as <p> elements
     for (var j = 0; j < individual_info.length; j++) {
       var p = document.createElement("p");
       const [key, value] = individual_info[j];
       p.innerHTML = `${key}: ${value}`;
       demographicInfo.appendChild(p);
     }
-    
 
     // Information for bar graph
     var x = data.samples
@@ -128,6 +125,36 @@ function init() {
   });
 }
 
+// Update demographic information
+function update_Demographic_Info() {
+  // Get data
+  d3.json("data/samples.json").then(function (data) {
+    // Use D3 to select the dropdown menu to retreive the Test Subject ID No.
+    // This will be used to get the demographic data for the seleted Test Subject ID No.
+    var dropdownMenu = d3.select("#selDataset");
+    // Assign the value of the dropdown menu option to a variable
+    var dataset_id = data.names[dropdownMenu.property("value")];
+
+    // Use D3 to select the Demographic Info - Panel body
+    var demographicInfo = document.getElementById("sample-metadata");
+    // clear current input
+    demographicInfo.innerHTML = "";
+    // Retrieve the metadata information using the dataset_id
+    const metadata_entry = data.metadata.find(
+      (entry) => entry.id == dataset_id
+    );
+    // Select the information to display
+    const individual_info = Object.entries(metadata_entry);
+    // Loop through object to retrive all key value pairs and display as <p> elements
+    for (var j = 0; j < individual_info.length; j++) {
+      var p = document.createElement("p");
+      const [key, value] = individual_info[j];
+      p.innerHTML = `${key}: ${value}`;
+      demographicInfo.appendChild(p);
+    }
+  });
+}
+
 // This function is called when a dropdown menu item is selected to update the bar graph
 function updateBarPlotly() {
   // Get data
@@ -179,22 +206,8 @@ function updateBubbleChart() {
     Plotly.restyle("bubble", "x", [x_bb]);
     Plotly.restyle("bubble", "y", [y_bb]);
     Plotly.restyle("bubble", "size", [marker_size]);
-    PLotly.restyle("bubble", "color", [marker_color]);
+    Plotly.restyle("bubble", "color", [marker_color]);
     Plotly.restyle("bubble", "text", [text_value]);
-  });
-}
-
-// Function to add individual's demographic information
-function updateDemographic_info() {
-  // Get data
-  d3.json("data/samples.json").then(function (data) {
-    // Use D3 to select teh dropdown menu to retrieve the Test Subject ID No.
-    // This will be used to display on the information for the bubble chart
-    var dropdownMenu = d3.select("#selDataset");
-    // Assign the value of the dropdown menu option to a variable
-    var id = dropdownMenu.property("value");
-    // Assign a variable after diving into the data to find the selected Test Subject ID No.
-    var dataset = data.metadata[id];
   });
 }
 
@@ -202,5 +215,7 @@ function updateDemographic_info() {
 function update_all() {
   updateBarPlotly();
   updateBubbleChart();
+  update_Demographic_Info();
 }
+
 init();
